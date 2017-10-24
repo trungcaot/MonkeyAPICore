@@ -15,7 +15,11 @@ namespace MonkeyAPICore.Controllers
         {
             var response = new
             {
-                href = Url.Link(nameof(GetRoot), null)
+                href = Url.Link(nameof(GetRoot), null),
+                rooms = new
+                {
+                    href = Url.Link(nameof(RoomController.GetRooms), null)
+                }
             };
             return Ok(response);
         }
