@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using MonkeyAPICore.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using MonkeyAPICore.Filters;
 
 namespace MonkeyAPICore
 {
@@ -29,6 +30,8 @@ namespace MonkeyAPICore
         {
             services.AddMvc(opt => 
             {
+                opt.Filters.Add(typeof(JsonExceptionFilter));
+
                 var jsonFormatter = opt.OutputFormatters.OfType<JsonOutputFormatter>().Single();
                 opt.OutputFormatters.Remove(jsonFormatter);
 
