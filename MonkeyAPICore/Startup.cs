@@ -24,6 +24,8 @@ namespace MonkeyAPICore
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            services.AddRouting(opt => opt.LowercaseUrls = true);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
