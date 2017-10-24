@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using MonkeyAPICore.Infrastructure;
 
 namespace MonkeyAPICore
 {
@@ -23,7 +25,13 @@ namespace MonkeyAPICore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc(opt => 
+            {
+                var jsonFormatter = opt.OutputFormatters.OfType<JsonOutputFormatter>().Single();
+                opt.OutputFormatters.Remove(jsonFormatter);
+
+                opt.OutputFormatters.Add(new IonOutputFormatter(jsonFormatter));
+            });
 
             services.AddRouting(opt => opt.LowercaseUrls = true);
         }
