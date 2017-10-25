@@ -18,9 +18,13 @@ namespace MonkeyAPICore
 {
     public class Startup
     {
+        private readonly int? _httpsPort;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            _httpsPort = configuration.GetValue<int>("iisSettings:iisExpress:sslPort");
         }
 
         public IConfiguration Configuration { get; }
@@ -31,6 +35,10 @@ namespace MonkeyAPICore
             services.AddMvc(opt => 
             {
                 opt.Filters.Add(typeof(JsonExceptionFilter));
+
+                // Require HTTPS for all controller
+                opt.SslPort = _httpsPort;
+                opt.Filters.Add(typeof(RequireHttpsAttribute));
 
                 var jsonFormatter = opt.OutputFormatters.OfType<JsonOutputFormatter>().Single();
                 opt.OutputFormatters.Remove(jsonFormatter);
@@ -58,6 +66,12 @@ namespace MonkeyAPICore
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHsts(opt =>
+            {
+                opt.MaxAge(days: 180);
+                opt.IncludeSubdomains();
+                opt.Preload();
+            });
             app.UseMvc();
         }
     }
