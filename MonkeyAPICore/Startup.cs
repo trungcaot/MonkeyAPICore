@@ -13,6 +13,7 @@ using MonkeyAPICore.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using MonkeyAPICore.Filters;
+using MonkeyAPICore.Models;
 
 namespace MonkeyAPICore
 {
@@ -56,6 +57,9 @@ namespace MonkeyAPICore
                 opt.DefaultApiVersion = new ApiVersion(1,0);
                 opt.ApiVersionSelector = new CurrentImplementationApiVersionSelector(opt);
             });
+
+            // Load resource hotelinfo from appsettings.json
+            services.Configure<HotelInfo>(Configuration.GetSection("Info"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
