@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Mvc;
 using MonkeyAPICore.Filters;
 using MonkeyAPICore.Models;
 using Microsoft.EntityFrameworkCore;
+using MonkeyAPICore.Services;
+using AutoMapper;
 
 namespace MonkeyAPICore
 {
@@ -37,6 +39,8 @@ namespace MonkeyAPICore
             // Use an in-memory database for quick dev and testing.
             //TODO: Swap out with a real database in production
             services.AddDbContext<MonkeyAPIContext>(opt => opt.UseInMemoryDatabase());
+
+            services.AddAutoMapper();
 
             services.AddMvc(opt => 
             {
@@ -66,6 +70,8 @@ namespace MonkeyAPICore
 
             // Load resource hotelinfo from appsettings.json
             services.Configure<HotelInfo>(Configuration.GetSection("Info"));
+
+            services.AddScoped<IRoomService, RoomService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
