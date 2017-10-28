@@ -14,9 +14,14 @@ namespace MonkeyAPICore.Controllers
     public class RoomController : Controller
     {
         private readonly IRoomService _roomService;
-        public RoomController(IRoomService roomService)
+        private readonly IOpeningService _openingService;
+
+
+        public RoomController(IRoomService roomService,
+            IOpeningService openingService)
         {
             _roomService = roomService;
+            _openingService = openingService;
         }
 
         [HttpGet(Name = nameof(GetRoomsAsync))]
@@ -33,6 +38,22 @@ namespace MonkeyAPICore.Controllers
 
             return Ok(collection);
         }
+
+        // GET /rooms/openings
+        [HttpGet("openings", Name = nameof(GetAllRoomOpeningsAsync))]
+        public async Task<IActionResult> GetAllRoomOpeningsAsync(CancellationToken ct)
+        {
+            var openings = await _openingService.GetOpeningsAsync(ct);
+
+            var collection = new Collection<Opening>()
+            {
+                Self = Link.ToCollection(nameof(GetAllRoomOpeningsAsync)),
+                Value = openings.ToArray()
+            };
+
+            return Ok(collection);
+        }
+
 
         //room/{roomId}
         [HttpGet("{roomId}", Name = nameof(GetRoomByIdAsync))]

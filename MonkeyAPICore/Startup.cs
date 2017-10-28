@@ -17,6 +17,7 @@ using MonkeyAPICore.Models;
 using Microsoft.EntityFrameworkCore;
 using MonkeyAPICore.Services;
 using AutoMapper;
+using Newtonsoft.Json;
 
 namespace MonkeyAPICore
 {
@@ -55,6 +56,13 @@ namespace MonkeyAPICore
                 opt.OutputFormatters.Remove(jsonFormatter);
 
                 opt.OutputFormatters.Add(new IonOutputFormatter(jsonFormatter));
+            })
+            .AddJsonOptions(opt =>
+            {
+                // These should be the defaults, but we can be explicit:
+                opt.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+                opt.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+                opt.SerializerSettings.DateParseHandling = DateParseHandling.DateTimeOffset;
             });
 
             // config all api follow camel standard
@@ -70,9 +78,13 @@ namespace MonkeyAPICore
             });
 
             // Load resource hotelinfo from appsettings.json
+            services.Configure<HotelOptions>(Configuration);
             services.Configure<HotelInfo>(Configuration.GetSection("Info"));
 
             services.AddScoped<IRoomService, RoomService>();
+            services.AddScoped<IOpeningService, OpeningService>();
+            services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<IDateLogicService, DateLogicService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -84,7 +96,8 @@ namespace MonkeyAPICore
 
                 // Add some test data in development
                 var context = serviceProvider.GetService<MonkeyAPIContext>();
-                AddTestData(context);
+                var dateLogicService = serviceProvider.GetService<IDateLogicService>();
+                AddTestData(context, dateLogicService);
 
             }
 
@@ -97,20 +110,35 @@ namespace MonkeyAPICore
             app.UseMvc();
         }
 
-        private static void AddTestData(MonkeyAPIContext context)
+        private static void AddTestData(MonkeyAPIContext context,
+            IDateLogicService dateLogicService)
         {
-            context.Rooms.Add(new RoomEntity
+            var oxford = context.Rooms.Add(new RoomEntity
             {
                 Id = Guid.Parse("301df04d-8679-4b1b-ab92-0a586ae53d08"),
                 Name = "Oxford Suite",
                 Rate = 10119,
-            });
+            }).Entity;
 
             context.Rooms.Add(new RoomEntity
             {
                 Id = Guid.Parse("ee2b83be-91db-4de5-8122-35a9e9195976"),
                 Name = "Driscoll Suite",
                 Rate = 23959
+            });
+
+            var today = DateTimeOffset.Now;
+            var start = dateLogicService.AlignStartTime(today);
+            var end = start.Add(dateLogicService.GetMinimumStay());
+
+            context.Bookings.Add(new BookingEntity
+            {
+                Id = Guid.Parse("2eac8dea-2749-42b3-9d21-8eb2fc0fd6bd"),
+                Room = oxford,
+                CreatedAt = DateTimeOffset.UtcNow,
+                StartAt = start,
+                EndAt = end,
+                Total = oxford.Rate,
             });
 
             context.SaveChanges();
