@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MonkeyAPICore.Models;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace MonkeyAPICore.Services
 {
@@ -23,6 +24,14 @@ namespace MonkeyAPICore.Services
             if (entity == null) return null;
 
             return Mapper.Map<Room>(entity); 
+        }
+
+        public async Task<IEnumerable<Room>> GetRoomsAsync(CancellationToken ct)
+        {
+            var query = _context.Rooms
+                    .ProjectTo<Room>();
+
+            return await query.ToArrayAsync();
         }
     }
 }
