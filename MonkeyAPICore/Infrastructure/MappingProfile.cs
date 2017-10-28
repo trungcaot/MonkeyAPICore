@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MonkeyAPICore.Controllers;
 using MonkeyAPICore.Models;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,9 @@ namespace MonkeyAPICore.Infrastructure
         public MappingProfile()
         {
             CreateMap<RoomEntity, Room>()
-                .ForMember(dest => dest.Rate, opt => opt.MapFrom(src => src.Rate / 100.0m));
+                .ForMember(dest => dest.Rate, opt => opt.MapFrom(src => src.Rate / 100.0m))
+                .ForMember(dest => dest.Self, opt => opt.MapFrom(src =>
+                    Link.To(nameof(RoomController.GetRoomByIdAsync), new { roomId = src.Id })));
         }
     }
 }

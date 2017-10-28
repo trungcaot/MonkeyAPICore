@@ -45,6 +45,7 @@ namespace MonkeyAPICore
             services.AddMvc(opt => 
             {
                 opt.Filters.Add(typeof(JsonExceptionFilter));
+                opt.Filters.Add(typeof(LinkRewritingFilter));
 
                 // Require HTTPS for all controller
                 opt.SslPort = _httpsPort;

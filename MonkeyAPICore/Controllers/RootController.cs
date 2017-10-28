@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MonkeyAPICore.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +14,12 @@ namespace MonkeyAPICore.Controllers
         [HttpGet(Name = nameof(GetRoot))]
         public IActionResult GetRoot()
         {
-            var response = new
+            var response = new RootResponse
             {
-                href = Url.Link(nameof(GetRoot), null),
-                rooms = new { href = Url.Link(nameof(RoomController.GetRooms), null) },
-                hotelInfo = new { href = Url.Link(nameof(InfoController.GetInfo), null) }
+                // don't forget update mappiing 
+                Self = Link.To(nameof(GetRoot)),
+                Info = Link.To(nameof(InfoController.GetInfo)),
+                Rooms = Link.To(nameof(RoomController.GetRooms))
             };
             return Ok(response);
         }
