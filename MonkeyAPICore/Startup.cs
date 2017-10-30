@@ -80,6 +80,7 @@ namespace MonkeyAPICore
             // Load resource hotelinfo from appsettings.json
             services.Configure<HotelOptions>(Configuration);
             services.Configure<HotelInfo>(Configuration.GetSection("Info"));
+            services.Configure<PagingOptions>(Configuration.GetSection("DefaultPagingOptions"));
 
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IOpeningService, OpeningService>();

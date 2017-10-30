@@ -1,10 +1,29 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Newtonsoft.Json;
 using System.ComponentModel;
+using System.Linq;
 
 namespace MonkeyAPICore.Models
 {
     public class ApiError
     {
+        public ApiError()
+        {
+        }
+
+        public ApiError(string message)
+        {
+            Message = message;
+        }
+
+        public ApiError(ModelStateDictionary modelState)
+        {
+            Message = "Invalid parameters.";
+            Detail = modelState
+                .FirstOrDefault(x => x.Value.Errors.Any()).Value.Errors
+                .FirstOrDefault().ErrorMessage;
+        }
+
         public string Message { get; set; }
         public string Detail { get; set; }
 

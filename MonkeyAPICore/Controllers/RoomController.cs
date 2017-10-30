@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using MonkeyAPICore.Models;
 using MonkeyAPICore.Services;
 using System;
@@ -15,13 +16,16 @@ namespace MonkeyAPICore.Controllers
     {
         private readonly IRoomService _roomService;
         private readonly IOpeningService _openingService;
+        private readonly PagingOptions _defaultPagingOptions;
 
 
         public RoomController(IRoomService roomService,
-            IOpeningService openingService)
+            IOpeningService openingService,
+            IOptions<PagingOptions> defaultPagingOptions)
         {
             _roomService = roomService;
             _openingService = openingService;
+            _defaultPagingOptions = defaultPagingOptions.Value;
         }
 
         [HttpGet(Name = nameof(GetRoomsAsync))]
@@ -41,15 +45,23 @@ namespace MonkeyAPICore.Controllers
 
         // GET /rooms/openings
         [HttpGet("openings", Name = nameof(GetAllRoomOpeningsAsync))]
-        public async Task<IActionResult> GetAllRoomOpeningsAsync(CancellationToken ct)
+        public async Task<IActionResult> GetAllRoomOpeningsAsync(
+            [FromQuery] PagingOptions pagingOptions,
+            CancellationToken ct)
         {
-            var openings = await _openingService.GetOpeningsAsync(ct);
+            if (!ModelState.IsValid) return BadRequest(new ApiError(ModelState));
 
-            var collection = new Collection<Opening>()
-            {
-                Self = Link.ToCollection(nameof(GetAllRoomOpeningsAsync)),
-                Value = openings.ToArray()
-            };
+            pagingOptions.Offset = pagingOptions.Offset ?? _defaultPagingOptions.Offset;
+            pagingOptions.Limit = pagingOptions.Limit ?? _defaultPagingOptions.Limit;
+
+            var openings = await _openingService.GetOpeningsAsync(pagingOptions, ct);
+
+            var collection = PagedCollection<Opening>.Create(
+                Link.ToCollection(nameof(GetAllRoomOpeningsAsync)),
+                openings.Items.ToArray(),
+                openings.TotalSize,
+                pagingOptions
+                );
 
             return Ok(collection);
         }

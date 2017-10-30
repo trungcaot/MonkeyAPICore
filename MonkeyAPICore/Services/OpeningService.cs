@@ -20,7 +20,9 @@ namespace MonkeyAPICore.Services
             _dateLogicService = dateLogicService;
         }
 
-        public async Task<IEnumerable<Opening>> GetOpeningsAsync(CancellationToken ct)
+        public async Task<PagedResults<Opening>> GetOpeningsAsync(
+            PagingOptions pagingOptions,
+            CancellationToken ct)
         {
             var rooms = await _context.Rooms.ToArrayAsync();
 
@@ -55,7 +57,15 @@ namespace MonkeyAPICore.Services
                 allOpenings.AddRange(openings);
             }
 
-            return allOpenings;
+            var pagedOpenings = allOpenings
+                .Skip(pagingOptions.Offset.Value)
+                .Take(pagingOptions.Limit.Value);
+
+            return new PagedResults<Opening>
+            {
+                Items = pagedOpenings,
+                TotalSize = allOpenings.Count
+            };
         }
 
         public async Task<IEnumerable<BookingRange>> GetConflictingSlots(
