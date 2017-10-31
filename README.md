@@ -1,6 +1,8 @@
 # MonkeyAPICore
 Most people have heard of RESTful APIs, RESTfuls API use this architecture along with HTTP requests to transfer data and changes in application state between client and server. This course will break down the principles of RESTfuls design and show how to build secure RESTful APIs on top of APS.NET Core. In this project, we will research and working with API in ASP.NET core together. By the end of follow this project, you can confident build a project with news function for yourseft. 
 
+Note: You should follow each commit code in this source in order to you saw something change code from first to last.
+
 ### Topics include:
 - REST vs RPC
 - Using HTTP methods
