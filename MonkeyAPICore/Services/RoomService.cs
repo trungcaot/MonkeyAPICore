@@ -26,12 +26,26 @@ namespace MonkeyAPICore.Services
             return Mapper.Map<Room>(entity); 
         }
 
-        public async Task<IEnumerable<Room>> GetRoomsAsync(CancellationToken ct)
+        public async Task<PagedResults<Room>> GetRoomsAsync(PagingOptions pagingOptions,
+            SortOptions<Room, RoomEntity> sortOptions,
+            CancellationToken ct)
         {
-            var query = _context.Rooms
-                    .ProjectTo<Room>();
+            IQueryable<RoomEntity> query = _context.Rooms;
+            query = sortOptions.Apply(query);
 
-            return await query.ToArrayAsync();
+
+            var size = await query.CountAsync(ct);
+
+            var items = await query
+                .Skip(pagingOptions.Offset.Value)
+                .Take(pagingOptions.Limit.Value)
+                .ProjectTo<Room>()
+                .ToArrayAsync(ct);
+            return new PagedResults<Room>
+            {
+                Items = items,
+                TotalSize = size
+            };
         }
     }
 }

@@ -12,7 +12,9 @@ namespace MonkeyAPICore.Services
         Task<Room> GetRoomAsync(Guid id,
             CancellationToken ct);
 
-        Task<IEnumerable<Room>> GetRoomsAsync(
+        Task<PagedResults<Room>> GetRoomsAsync(
+            PagingOptions pagingOptions,
+            SortOptions<Room,RoomEntity> sortOptions,
             CancellationToken ct);
     }
 }

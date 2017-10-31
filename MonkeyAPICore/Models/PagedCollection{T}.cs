@@ -47,6 +47,22 @@ namespace MonkeyAPICore.Models
                 Last = GetLastLink(self, size, pagingOptions)
             };
 
+        public static TResponse Create<TResponse>(Link self, T[] items, int size, PagingOptions pagingOptions)
+            where TResponse : PagedCollection<T>, new()
+            => new TResponse
+            {
+                Self = self,
+                Value = items,
+                Size = size,
+                Offset = pagingOptions.Offset,
+                Limit = pagingOptions.Limit,
+                First = self,
+                Next = GetNextLink(self, size, pagingOptions),
+                Previous = GetPreviousLink(self, size, pagingOptions),
+                Last = GetLastLink(self, size, pagingOptions)
+            };
+
+
         private static Link GetNextLink(Link self, int size, PagingOptions pagingOptions)
         {
             if (pagingOptions.Offset == null || pagingOptions.Limit == null) return null;

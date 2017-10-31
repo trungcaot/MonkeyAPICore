@@ -29,17 +29,25 @@ namespace MonkeyAPICore.Controllers
         }
 
         [HttpGet(Name = nameof(GetRoomsAsync))]
-        public async Task<IActionResult> GetRoomsAsync(CancellationToken ct)
+        public async Task<IActionResult> GetRoomsAsync(
+            [FromQuery] PagingOptions pagingOptions,
+            [FromQuery] SortOptions<Room, RoomEntity> sortOptions,
+            CancellationToken ct)
         {
-            var rooms = await _roomService.GetRoomsAsync(ct);
+            if (!ModelState.IsValid) return BadRequest(new ApiError(ModelState));
 
-            var collectionLink = Link.ToCollection(nameof(GetRoomsAsync));
-            var collection = new Collection<Room>
-            {
-                Self = collectionLink,
-                Value = rooms.ToArray()
-            };
+            pagingOptions.Offset = pagingOptions.Offset ?? _defaultPagingOptions.Offset;
+            pagingOptions.Limit = pagingOptions.Limit ?? _defaultPagingOptions.Limit;
 
+            var rooms = await _roomService.GetRoomsAsync(pagingOptions,sortOptions, ct);
+
+            var collection = PagedCollection<Room>.Create<RoomsResponse>(
+                Link.ToCollection(nameof(GetRoomsAsync)),
+                rooms.Items.ToArray(),
+                rooms.TotalSize,
+                pagingOptions);
+            collection.Openings = Link.ToCollection(nameof(GetRoomsAsync));
+            
             return Ok(collection);
         }
 
