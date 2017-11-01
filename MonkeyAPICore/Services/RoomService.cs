@@ -28,9 +28,13 @@ namespace MonkeyAPICore.Services
 
         public async Task<PagedResults<Room>> GetRoomsAsync(PagingOptions pagingOptions,
             SortOptions<Room, RoomEntity> sortOptions,
+            SearchOptions<Room, RoomEntity> searchOptions,
             CancellationToken ct)
         {
             IQueryable<RoomEntity> query = _context.Rooms;
+            // step 1: searching data by parameters
+            query = searchOptions.Apply(query);
+            // step 2: sorting data after searching
             query = sortOptions.Apply(query);
 
 

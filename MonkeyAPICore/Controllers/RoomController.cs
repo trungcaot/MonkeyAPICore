@@ -32,6 +32,7 @@ namespace MonkeyAPICore.Controllers
         public async Task<IActionResult> GetRoomsAsync(
             [FromQuery] PagingOptions pagingOptions,
             [FromQuery] SortOptions<Room, RoomEntity> sortOptions,
+            [FromQuery] SearchOptions<Room, RoomEntity> searchOptions,
             CancellationToken ct)
         {
             if (!ModelState.IsValid) return BadRequest(new ApiError(ModelState));
@@ -39,7 +40,10 @@ namespace MonkeyAPICore.Controllers
             pagingOptions.Offset = pagingOptions.Offset ?? _defaultPagingOptions.Offset;
             pagingOptions.Limit = pagingOptions.Limit ?? _defaultPagingOptions.Limit;
 
-            var rooms = await _roomService.GetRoomsAsync(pagingOptions,sortOptions, ct);
+            var rooms = await _roomService.GetRoomsAsync(pagingOptions,
+                sortOptions, 
+                searchOptions, 
+                ct);
 
             var collection = PagedCollection<Room>.Create<RoomsResponse>(
                 Link.ToCollection(nameof(GetRoomsAsync)),
