@@ -19,7 +19,7 @@ namespace MonkeyAPICore.Controllers
                 // don't forget update mappiing 
                 Self = Link.To(nameof(GetRoot)),
                 Info = Link.To(nameof(InfoController.GetInfo)),
-                Rooms = Link.To(nameof(RoomController.GetRoomsAsync))
+                Rooms = Link.To(nameof(RoomsController.GetRoomsAsync))
             };
             return Ok(response);
         }
