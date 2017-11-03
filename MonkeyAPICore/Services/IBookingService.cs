@@ -17,5 +17,7 @@ namespace MonkeyAPICore.Services
             DateTimeOffset startAt,
             DateTimeOffset endAt,
             CancellationToken ct);
+
+        Task DeleteBookingAsync(Guid bookingId, CancellationToken ct);
     }
 }

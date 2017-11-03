@@ -55,6 +55,16 @@ namespace MonkeyAPICore.Services
             return id;
         }
 
+        public async Task DeleteBookingAsync(Guid bookingId, CancellationToken ct)
+        {
+            var booking = await _context.Bookings
+                .SingleOrDefaultAsync(b => b.Id == bookingId, ct);
+            if (booking == null) return;
+
+            _context.Bookings.Remove(booking);
+            await _context.SaveChangesAsync(ct);
+        }
+
         public async Task<Booking> GetBookingAsync(
             Guid bookingId,
             CancellationToken ct)

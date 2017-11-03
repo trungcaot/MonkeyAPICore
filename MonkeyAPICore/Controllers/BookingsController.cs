@@ -29,5 +29,17 @@ namespace MonkeyAPICore.Controllers
 
             return Ok(booking);
         }
+
+        // TODO: authorization
+        // DELETE bookings/{bookingId}
+        [HttpDelete("{bookingId}",Name = nameof(DeleteBookingByIdAsync))]
+        public async Task<IActionResult> DeleteBookingByIdAsync(
+            Guid bookingId,
+            CancellationToken ct)
+        {
+            //TODO: Authorize that the user is allowed to delete!
+            await _bookingService.DeleteBookingAsync(bookingId, ct);
+            return NoContent();
+        }
     }
 }
