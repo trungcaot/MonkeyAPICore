@@ -13,6 +13,7 @@ namespace MonkeyAPICore.Models
     public class Link
     {
         public const string GET_MOTHOD = "GET";
+        public const string POST_METHOD = "POST";
 
         public static Link To(string routeName, object routeValues = null)
             => new Link
@@ -30,6 +31,19 @@ namespace MonkeyAPICore.Models
                 RouteValues = routeValues,
                 Method = GET_MOTHOD,
                 Relations = new string[] { "collection" }
+            };
+
+        public static Link ToForm(
+            string routeName,
+            object routeValues = null,
+            string method = POST_METHOD,
+            params string[] relations)
+            => new Link
+            {
+                RouteName = routeName,
+                RouteValues = routeValues,
+                Method = method,
+                Relations = relations
             };
 
         [JsonProperty(Order = -4)]

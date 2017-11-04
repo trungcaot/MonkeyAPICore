@@ -15,5 +15,7 @@ namespace MonkeyAPICore.Models
         [Sortable(Default = true)]
         [SearchableDecimal]
         public decimal Rate { get; set; }
+
+        public Form Book { get; set; }
     }
 }

@@ -8,18 +8,26 @@ namespace MonkeyAPICore.Infrastructure
 {
     public class SearchExpressionProvider : ISearchExpressionProvider
     {
+        protected const string EqualsOperator = "eq";
+
         public virtual ConstantExpression GetValue(string input)
             => Expression.Constant(input);
 
         public virtual Expression GetComparison(
-            MemberExpression left,
-            string op,
-            ConstantExpression right)
+             MemberExpression left,
+             string op,
+             ConstantExpression right)
         {
-            if (!op.Equals("eq", StringComparison.OrdinalIgnoreCase))
-                throw new ArgumentException($"Invalid operator '{op}'.");
+            switch (op.ToLower())
+            {
+                case EqualsOperator: return Expression.Equal(left, right);
+                default: throw new ArgumentException($"Invalid operator '{op}'.");
+            }
+        }
 
-            return Expression.Equal(left, right);
+        public virtual IEnumerable<string> GetOperators()
+        {
+            yield return EqualsOperator;
         }
     }
 }
