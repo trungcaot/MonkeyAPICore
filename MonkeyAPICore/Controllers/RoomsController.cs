@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using MonkeyAPICore.Infrastructure;
 using MonkeyAPICore.Models;
 using MonkeyAPICore.Services;
 using System;
@@ -58,7 +59,13 @@ namespace MonkeyAPICore.Controllers
                 rooms.TotalSize,
                 pagingOptions);
             collection.Openings = Link.ToCollection(nameof(GetRoomsAsync));
-            
+            collection.RoomsQuery = FormMetadata.FromResource<Room>(
+                Link.ToForm(
+                    nameof(GetRoomsAsync),
+                    null,
+                    Link.GET_MOTHOD,
+                    Form.QueryRelation));
+
             return Ok(collection);
         }
 
@@ -84,7 +91,6 @@ namespace MonkeyAPICore.Controllers
 
             return Ok(collection);
         }
-
 
         //rooms/{roomId}
         [HttpGet("{roomId}", Name = nameof(GetRoomByIdAsync))]
