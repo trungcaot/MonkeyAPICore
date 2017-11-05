@@ -43,6 +43,8 @@ namespace MonkeyAPICore
 
             services.AddAutoMapper();
 
+            services.AddResponseCaching();
+
             services.AddMvc(opt => 
             {
                 opt.Filters.Add(typeof(JsonExceptionFilter));
@@ -56,6 +58,11 @@ namespace MonkeyAPICore
                 opt.OutputFormatters.Remove(jsonFormatter);
 
                 opt.OutputFormatters.Add(new IonOutputFormatter(jsonFormatter));
+
+                opt.CacheProfiles.Add("Static", new CacheProfile
+                {
+                    Duration = 86400
+                });
             })
             .AddJsonOptions(opt =>
             {
@@ -108,6 +115,8 @@ namespace MonkeyAPICore
                 opt.IncludeSubdomains();
                 opt.Preload();
             });
+
+            app.UseResponseCaching();
             app.UseMvc();
         }
 

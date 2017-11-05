@@ -71,6 +71,7 @@ namespace MonkeyAPICore.Controllers
 
         // GET /rooms/openings
         [HttpGet("openings", Name = nameof(GetAllRoomOpeningsAsync))]
+        [ResponseCache(Duration = 30, VaryByQueryKeys = new[] { "offest", "limit", "orderBy", "search" })]
         public async Task<IActionResult> GetAllRoomOpeningsAsync(
             [FromQuery] PagingOptions pagingOptions,
             CancellationToken ct)
