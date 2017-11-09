@@ -42,6 +42,11 @@ namespace MonkeyAPICore.Infrastructure
                     Link.To(
                         nameof(Controllers.RoomsController.GetRoomByIdAsync),
                         new { roomId = src.Room.Id })));
+
+            CreateMap<UserEntity, User>()
+                .ForMember(dest => dest.Self, opt => opt.MapFrom(src =>
+                    Link.To(nameof(Controllers.UsersController.GetUserByIdAsync),
+                            new { userId = src.Id })));
         }
     }
 }

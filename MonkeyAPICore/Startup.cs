@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using MonkeyAPICore.Services;
 using AutoMapper;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Identity;
 
 namespace MonkeyAPICore
 {
@@ -40,6 +41,11 @@ namespace MonkeyAPICore
             // Use an in-memory database for quick dev and testing.
             //TODO: Swap out with a real database in production
             services.AddDbContext<MonkeyAPIContext>(opt => opt.UseInMemoryDatabase());
+
+            // Add ASP .NET Core Identity
+            services.AddIdentity<UserEntity, UserRoleEntity>()
+                .AddEntityFrameworkStores<MonkeyAPIContext>()
+                .AddDefaultTokenProviders();
 
             services.AddAutoMapper();
 
@@ -93,6 +99,7 @@ namespace MonkeyAPICore
             services.AddScoped<IOpeningService, OpeningService>();
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IDateLogicService, DateLogicService>();
+            services.AddScoped<IUserService, DefaultUserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -101,6 +108,10 @@ namespace MonkeyAPICore
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                var roleManager = serviceProvider.GetService<RoleManager<UserRoleEntity>>();
+                var userManager = serviceProvider.GetService<UserManager<UserEntity>>();
+                AddTestUsers(roleManager, userManager).Wait();
 
                 // Add some test data in development
                 var context = serviceProvider.GetService<MonkeyAPIContext>();
@@ -118,6 +129,30 @@ namespace MonkeyAPICore
 
             app.UseResponseCaching();
             app.UseMvc();
+        }
+
+        private static async Task AddTestUsers(
+             RoleManager<UserRoleEntity> roleManager,
+             UserManager<UserEntity> userManager)
+        {
+            // Add a test role
+            await roleManager.CreateAsync(new UserRoleEntity("Admin"));
+
+            // Add a test user
+            var user = new UserEntity
+            {
+                Email = "admin@landon.local",
+                UserName = "admin@landon.local",
+                FirstName = "Admin",
+                LastName = "Testerman",
+                CreatedAt = DateTimeOffset.UtcNow
+            };
+
+            await userManager.CreateAsync(user, "Supersecret123!!");
+
+            // Put the user in the admin role
+            await userManager.AddToRoleAsync(user, "Admin");
+            await userManager.UpdateAsync(user);
         }
 
         private static void AddTestData(MonkeyAPIContext context,

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MonkeyAPICore.Models;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MonkeyAPICore
 {
-    public class MonkeyAPIContext : DbContext
+    public class MonkeyAPIContext : IdentityDbContext<UserEntity, UserRoleEntity,Guid>
     {
         public MonkeyAPIContext(DbContextOptions options)
             : base(options) { }
