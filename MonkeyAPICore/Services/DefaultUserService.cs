@@ -19,6 +19,27 @@ namespace MonkeyAPICore.Services
             _userManager = userManager;
         }
 
+        public async Task<(bool Succeeded, string Error)> CreateUserAsync(RegisterForm form)
+        {
+            var entity = new UserEntity
+            {
+                Email = form.Email,
+                UserName = form.Email,
+                FirstName = form.FirstName,
+                LastName = form.LastName,
+                CreatedAt = DateTimeOffset.UtcNow
+            };
+
+            var result = await _userManager.CreateAsync(entity, form.Password);
+            if (!result.Succeeded)
+            {
+                var firstError = result.Errors.FirstOrDefault()?.Description;
+                return (false, firstError);
+            }
+
+            return (true, null);
+        }
+
         public async Task<PagedResults<User>> GetUsersAsync(
             PagingOptions pagingOptions,
             SortOptions<User, UserEntity> sortOptions,

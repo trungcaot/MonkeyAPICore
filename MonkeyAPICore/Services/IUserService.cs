@@ -14,5 +14,7 @@ namespace MonkeyAPICore.Services
             SortOptions<User, UserEntity> sortOptions,
             SearchOptions<User, UserEntity> searchOptions,
             CancellationToken ct);
+
+        Task<(bool Succeeded, string Error)> CreateUserAsync(RegisterForm form);
     }
 }
