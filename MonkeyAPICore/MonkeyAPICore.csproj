@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.Validation" Version="2.0.0-rc1-final" />
     <PackageReference Include="AutoMapper" Version="6.1.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="3.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
@@ -19,6 +20,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.0.0" />
     <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="1.1.0" />
+    <PackageReference Include="OpenIddict" Version="2.0.0-rc1-final" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="2.0.0-rc1-final" />
+    <PackageReference Include="OpenIddict.Mvc" Version="2.0.0-rc1-final" />
   </ItemGroup>
 
   <ItemGroup>

@@ -19,6 +19,7 @@ using MonkeyAPICore.Services;
 using AutoMapper;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Identity;
+using AspNet.Security.OpenIdConnect.Primitives;
 
 namespace MonkeyAPICore
 {
@@ -40,7 +41,46 @@ namespace MonkeyAPICore
         {
             // Use an in-memory database for quick dev and testing.
             //TODO: Swap out with a real database in production
-            services.AddDbContext<MonkeyAPIContext>(opt => opt.UseInMemoryDatabase());
+            services.AddDbContext<MonkeyAPIContext>(opt => 
+            {
+                opt.UseInMemoryDatabase();
+                opt.UseOpenIddict();
+            });
+
+            // Map some of the default claim names to the proper OpenID Connect claim names
+            services.Configure<IdentityOptions>(opt =>
+            {
+                opt.ClaimsIdentity.UserNameClaimType = OpenIdConnectConstants.Claims.Name;
+                opt.ClaimsIdentity.UserIdClaimType = OpenIdConnectConstants.Claims.Subject;
+                opt.ClaimsIdentity.RoleClaimType = OpenIdConnectConstants.Claims.Role;
+            });
+
+            // Register the OAuth2 validation handler.
+            services.AddAuthentication()
+                .AddOAuthValidation();
+
+            // Register the OpenIddict services.
+            // Note: use the generic overload if you need
+            // to replace the default OpenIddict entities.
+            services.AddOpenIddict<Guid>(options =>
+            {
+                // Register the Entity Framework stores.
+                options.AddEntityFrameworkCoreStores<MonkeyAPIContext>();
+
+                // Register the ASP.NET Core MVC binder used by OpenIddict.
+                // Note: if you don't call this method, you won't be able to
+                // bind OpenIdConnectRequest or OpenIdConnectResponse parameters.
+                options.AddMvcBinders();
+
+                // Enable the token endpoint (required to use the password flow).
+                options.EnableTokenEndpoint("/token");
+
+                // Allow client applications to use the grant_type=password flow.
+                options.AllowPasswordFlow();
+
+                // During development, you can disable the HTTPS requirement.
+                options.DisableHttpsRequirement();
+            });
 
             // Add ASP .NET Core Identity
             services.AddIdentity<UserEntity, UserRoleEntity>()
@@ -126,6 +166,8 @@ namespace MonkeyAPICore
                 opt.IncludeSubdomains();
                 opt.Preload();
             });
+
+            app.UseAuthentication();
 
             app.UseResponseCaching();
             app.UseMvc();
